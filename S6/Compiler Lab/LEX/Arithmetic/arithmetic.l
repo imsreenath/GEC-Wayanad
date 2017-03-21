@@ -1,7 +1,9 @@
 letter [a-zA-Z]
-operator "+"|"-"|"/"|"%"|"*"|"="
+operator "+"|"-"|"/"|"%"|"*"
+eqOperator "="
 opBracket "("
 clsBracket ")"
+increment "++"|"--"
 
 
 %{
@@ -9,11 +11,18 @@ clsBracket ")"
 	int opCount=0;
 	int opbCount=0;
 	int clsCount=0;
+	int count = 0;
 %}
 
 %%
+{increment}{letter} {printf("\nvalid Arithmetic Expression");count = 1;}
+{letter}{operator}{eqOperator}{letter} {printf("\nvalid Arithmetic Expression");count = 1;}
+{letter}{eqOperator}"-"{letter} {printf("\nvalid Arithmetic Expression");count = 1;}
+{letter}{increment} {printf("\nvalid Arithmetic Expression");count = 1;}
+{letter}"="{letter}{increment} {printf("valid Arithmetic Expression");count = 1;}
+{letter}"="{increment}{letter} {printf("valid Arithmetic Expression");count = 1;}
 {letter}({letter})* {idCount++;}
-{operator} {opCount++;}
+{operator}|{eqOperator} {opCount++;}
 {opBracket} {opbCount++;}
 {clsBracket} {clsCount++;}
 %%
@@ -26,14 +35,17 @@ main(int argc, char* argv[])
 		yyin = fp;
 	yylex();
 
-	printf("\nOp: %d\nId: %d\n",opCount,idCount);
+	if(count==0)
+	{
 	if((opCount < idCount) && (opbCount == clsCount))
 	{
-		printf("\nValid Expression\n");
+		printf("\nValid Arithmetic Expression\n");
 	}
 	else
 	{
-		printf("\nInvalid Expression\n");
+		printf("\nInvalid Arithmetic Expression\n");
+	}
 	}
 	fclose(fp);
 }
+
